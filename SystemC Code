@@ -1,0 +1,52 @@
+#include <systemc.h>
+
+SC_MODULE(RoboticArm)
+{
+    sc_event sensor_event;
+    sc_event move_event;
+
+    void SensorProcess()
+    {
+        while(true)
+        {
+            wait(5, SC_NS);
+            cout<<"Sensor : Object Detected"<<endl;
+            sensor_event.notify();
+        }
+    }
+
+    void MotorProcess()
+    {
+        while(true)
+        {
+            wait(sensor_event);
+            cout<<"Motor Running"<<endl;
+            wait(10, SC_NS);
+            move_event.notify();
+        }
+    }
+
+    void ControllerProcess()
+    {
+        while(true)
+        {
+            wait(move_event);
+            cout<<"Robot Arm Picked Object"<<endl;
+            cout<<"Robot Arm Placed Object"<<endl;
+        }
+    }
+
+    SC_CTOR(RoboticArm)
+    {
+        SC_THREAD(SensorProcess);
+        SC_THREAD(MotorProcess);
+        SC_THREAD(ControllerProcess);
+    }
+};
+
+int sc_main(int argc,char* argv[])
+{
+    RoboticArm arm("IndustrialRobot");
+    sc_start(50,SC_NS);
+    return 0;
+}
