@@ -1,0 +1,50 @@
+#include <reg51.h>
+
+sbit motor = P1^0;
+sbit sensor_pin = P1^1;
+
+bit sensor = 0;
+bit arm_ready = 0;
+
+void delay()
+{
+    int i,j;
+    for(i=0;i<200;i++)
+        for(j=0;j<200;j++);
+}
+
+void ReadSensor()
+{
+    sensor = 1;
+}
+
+void MoveArm()
+{
+    if(sensor)
+    {
+        motor = 1;
+        delay();
+        arm_ready = 1;
+    }
+}
+
+void PlaceObject()
+{
+    if(arm_ready)
+    {
+        motor = 0;
+        sensor = 0;
+        arm_ready = 0;
+    }
+}
+
+void main()
+{
+    while(1)
+    {
+        ReadSensor();
+        MoveArm();
+        PlaceObject();
+        break;
+    }
+}
